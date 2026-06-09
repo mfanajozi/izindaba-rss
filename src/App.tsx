@@ -12,8 +12,9 @@ import { EmptyState } from './components/EmptyState';
 import { SASTClock } from './components/SASTClock';
 import { FeedStatus } from './components/FeedStatus';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Newspaper, RefreshCw, Sparkles } from 'lucide-react';
+import { Newspaper, RefreshCw, Sparkles, Download } from 'lucide-react';
 import { Button } from './components/ui/button';
+import { exportAsMarkdown, exportAsJSON, downloadFile } from './utils/exporter';
 
 const DEFAULT_FEEDS: RSSFeed[] = [
   {
@@ -141,6 +142,23 @@ export default function App() {
     storage.saveFeeds(updatedFeeds);
   };
 
+  const handleExport = (format: 'markdown' | 'json') => {
+    const now = new Date().toLocaleString('en-ZA', {
+      timeZone: 'Africa/Johannesburg',
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+    const dateSlug = new Date().toISOString().slice(0, 10);
+
+    if (format === 'markdown') {
+      const md = exportAsMarkdown(feeds, items, categories, now);
+      downloadFile(md, `izindaba-export-${dateSlug}.md`, 'text/markdown');
+    } else {
+      const json = exportAsJSON(feeds, items, categories);
+      downloadFile(json, `izindaba-export-${dateSlug}.json`, 'application/json');
+    }
+  };
+
   const handleDeleteFeed = (id: string) => {
     const isProtected = DEFAULT_FEEDS.some(f => f.id === id);
     if (isProtected) {
@@ -207,6 +225,34 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <FeedStatus isFetching={isFetching} fetchStatus={fetchStatus} />
                 
+                <div className="relative group">
+                  <Button
+                    onClick={() => handleExport('markdown')}
+                    disabled={items.length === 0}
+                    className="bg-white border border-amber-200 hover:bg-amber-50 text-slate-700 shadow-sm"
+                    title="Export data"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                  <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg border border-amber-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <button
+                      onClick={() => handleExport('markdown')}
+                      disabled={items.length === 0}
+                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-amber-50 first:rounded-t-lg disabled:opacity-40"
+                    >
+                      Markdown Report
+                    </button>
+                    <button
+                      onClick={() => handleExport('json')}
+                      disabled={items.length === 0}
+                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-amber-50 last:rounded-b-lg disabled:opacity-40"
+                    >
+                      JSON Backup
+                    </button>
+                  </div>
+                </div>
+
                 <Button
                   onClick={fetchAllFeeds}
                   disabled={isFetching || feeds.length === 0}
