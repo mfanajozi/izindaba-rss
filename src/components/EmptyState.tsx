@@ -1,10 +1,23 @@
-import { Rss, Sparkles } from 'lucide-react';
+import { Rss, Sparkles, Search } from 'lucide-react';
 
 interface EmptyStateProps {
   type: 'items' | 'feeds';
+  searchQuery?: string;
 }
 
-export function EmptyState({ type }: EmptyStateProps) {
+export function EmptyState({ type, searchQuery }: EmptyStateProps) {
+  if (searchQuery) {
+    return (
+      <div className="text-center py-16">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-4">
+          <Search className="w-8 h-8 text-amber-600" />
+        </div>
+        <h3 className="text-lg font-semibold text-slate-800 mb-2">No Results for "{searchQuery}"</h3>
+        <p className="text-slate-500 mb-4">Try a different keyword like "petrol", "economy", or "inflation".</p>
+      </div>
+    );
+  }
+
   if (type === 'items') {
     return (
       <div className="text-center py-16">

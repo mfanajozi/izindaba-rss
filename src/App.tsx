@@ -12,8 +12,9 @@ import { EmptyState } from './components/EmptyState';
 import { SASTClock } from './components/SASTClock';
 import { FeedStatus } from './components/FeedStatus';
 import { Pagination } from './components/Pagination';
+import { SearchBar } from './components/SearchBar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
-import { Newspaper, RefreshCw, Sparkles, Download } from 'lucide-react';
+import { Newspaper, RefreshCw, Sparkles, Download, Search } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { exportAsMarkdown, exportAsJSON, downloadFile } from './utils/exporter';
 
@@ -39,6 +40,7 @@ export default function App() {
   const [items, setItems] = useState<FeedItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isFetching, setIsFetching] = useState(false);
   const [fetchStatus, setFetchStatus] = useState<{ success: number; failed: number } | null>(null);
   const [lastFetch, setLastFetch] = useState<string | null>(null);
@@ -192,9 +194,18 @@ export default function App() {
     return colors[category.color] || colors.emerald;
   };
 
-  const filteredItems = selectedCategory 
-    ? items.filter(i => i.category === selectedCategory)
-    : items;
+  const filteredItems = items.filter(i => {
+    if (selectedCategory && i.category !== selectedCategory) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const match = i.title.toLowerCase().includes(q)
+        || i.description.toLowerCase().includes(q)
+        || i.category.toLowerCase().includes(q)
+        || i.feedTitle.toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    return true;
+  });
 
   const itemCounts: Record<string, number> = {};
   items.forEach(item => {
@@ -223,7 +234,7 @@ export default function App() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory]);
+  }, [selectedCategory, searchQuery]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
@@ -313,12 +324,23 @@ export default function App() {
 
           <TabsContent value="items" className="space-y-6">
             {items.length > 0 && (
-              <CategoryFilter
-                categories={categories}
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-                itemCounts={itemCounts}
-              />
+              <>
+                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                  <div className="flex-1 w-full sm:w-auto">
+                    <SearchBar
+                      value={searchQuery}
+                      onChange={setSearchQuery}
+                      totalResults={filteredItems.length}
+                    />
+                  </div>
+                  <CategoryFilter
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={setSelectedCategory}
+                    itemCounts={itemCounts}
+                  />
+                </div>
+              </>
             )}
             
             {filteredItems.length > 0 ? (
@@ -341,7 +363,7 @@ export default function App() {
                 />
               </>
             ) : (
-              <EmptyState type="items" />
+              <EmptyState type="items" searchQuery={searchQuery} />
             )}
           </TabsContent>
 
