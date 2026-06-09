@@ -252,9 +252,10 @@ export default function App() {
 
                 <div className="relative group shrink-0">
                   <Button
+                    variant="outline"
                     onClick={() => handleExport('markdown')}
                     disabled={items.length === 0}
-                    className="bg-white border border-amber-200 hover:bg-amber-50 text-slate-700 shadow-sm text-xs sm:text-sm px-3 sm:px-4"
+                    className="border-amber-200 hover:bg-amber-50 text-slate-700 shadow-sm text-xs sm:text-sm px-3 sm:px-4"
                     title="Export data"
                   >
                     <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
