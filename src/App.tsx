@@ -203,50 +203,51 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <header className="bg-white border-b border-amber-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg shadow-emerald-200">
-                <Sparkles className="w-6 h-6 text-white" />
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div className="p-2 sm:p-2.5 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg shadow-emerald-200 shrink-0">
+                <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight truncate">
                   Izindaba
                 </h1>
-                <p className="text-sm text-emerald-600 font-medium">
+                <p className="text-xs sm:text-sm text-emerald-600 font-medium truncate">
                   Your South African RSS Library
                 </p>
               </div>
             </div>
-            
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <SASTClock />
-              
-              <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-2 flex-wrap">
                 <FeedStatus isFetching={isFetching} fetchStatus={fetchStatus} />
-                
-                <div className="relative group">
+
+                <div className="relative group shrink-0">
                   <Button
                     onClick={() => handleExport('markdown')}
                     disabled={items.length === 0}
-                    className="bg-white border border-amber-200 hover:bg-amber-50 text-slate-700 shadow-sm"
+                    className="bg-white border border-amber-200 hover:bg-amber-50 text-slate-700 shadow-sm text-xs sm:text-sm px-3 sm:px-4"
                     title="Export data"
                   >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
+                    <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />
+                    <span className="hidden xs:inline">Export</span>
+                    <span className="xs:hidden">Export</span>
                   </Button>
-                  <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg border border-amber-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <div className="absolute right-0 top-full mt-1 w-36 sm:w-40 bg-white rounded-lg border border-amber-200 shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                     <button
                       onClick={() => handleExport('markdown')}
                       disabled={items.length === 0}
-                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-amber-50 first:rounded-t-lg disabled:opacity-40"
+                      className="w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-amber-50 first:rounded-t-lg disabled:opacity-40"
                     >
                       Markdown Report
                     </button>
                     <button
                       onClick={() => handleExport('json')}
                       disabled={items.length === 0}
-                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-amber-50 last:rounded-b-lg disabled:opacity-40"
+                      className="w-full text-left px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-slate-700 hover:bg-amber-50 last:rounded-b-lg disabled:opacity-40"
                     >
                       JSON Backup
                     </button>
@@ -256,9 +257,9 @@ export default function App() {
                 <Button
                   onClick={fetchAllFeeds}
                   disabled={isFetching || feeds.length === 0}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-200"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-md shadow-emerald-200 text-xs sm:text-sm px-3 sm:px-4 shrink-0"
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 ${isFetching ? 'animate-spin' : ''}`} />
                   {isFetching ? 'Fetching...' : 'Fetch Now'}
                 </Button>
               </div>
