@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { RSSFeed, FeedItem, Category } from './types';
 import { storage } from './utils/storage';
 import { feedManager } from './utils/feedManager';
@@ -11,6 +11,7 @@ import { CategoryFilter } from './components/CategoryFilter';
 import { EmptyState } from './components/EmptyState';
 import { SASTClock } from './components/SASTClock';
 import { FeedStatus } from './components/FeedStatus';
+import { Pagination } from './components/Pagination';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Newspaper, RefreshCw, Sparkles, Download } from 'lucide-react';
 import { Button } from './components/ui/button';
@@ -200,6 +201,30 @@ export default function App() {
     itemCounts[item.category] = (itemCounts[item.category] || 0) + 1;
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const ITEMS_PER_PAGE = isDesktop ? 24 : 12;
+
+  const sortedItems = useMemo(
+    () => filteredItems.sort((a, b) => b.fetchedAt - a.fetchedAt),
+    [filteredItems]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(sortedItems.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedItems = sortedItems.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-orange-50">
       <header className="bg-white border-b border-amber-200 sticky top-0 z-50 shadow-sm">
@@ -296,17 +321,24 @@ export default function App() {
             )}
             
             {filteredItems.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4">
-                {filteredItems
-                  .sort((a, b) => b.fetchedAt - a.fetchedAt)
-                  .map(item => (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {paginatedItems.map(item => (
                     <FeedItemCard
                       key={item.id}
                       item={item}
                       categoryColor={getCategoryColor(item.category)}
                     />
                   ))}
-              </div>
+                </div>
+                <Pagination
+                  currentPage={safePage}
+                  totalPages={totalPages}
+                  totalItems={sortedItems.length}
+                  perPage={ITEMS_PER_PAGE}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             ) : (
               <EmptyState type="items" />
             )}
